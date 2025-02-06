@@ -19,7 +19,9 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Parinay Matrimony',
       theme: ThemeData(
-        primarySwatch: Colors.red, // Theme color
+        primarySwatch: Colors.red,
+        focusColor: Colors.redAccent,
+        // Theme color
       ),
       initialRoute: '/',
       routes: {
