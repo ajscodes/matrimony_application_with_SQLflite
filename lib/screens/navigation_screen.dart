@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:matrimony_application/screens/list_page.dart';
 import 'home_screen.dart';
-import 'userlist_screen.dart';
 import 'bookmark_screen.dart';
 import 'aboutus_screen.dart';
 
@@ -14,7 +14,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
   final List<Widget> _pages = [
     HomeScreen(),
-    UserListScreen(),
+    ListPage(),
     BookmarkScreen(),
     AboutusScreen(),
   ];

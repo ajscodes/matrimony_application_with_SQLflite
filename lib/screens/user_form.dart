@@ -1,11 +1,11 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:matrimony_application/utils/database_helper.dart';
 
 class UserForm extends StatefulWidget {
   final String? name;
   final String? email;
-  final String? password;
   final String? city;
   final String? phone;
   final String? gender;
@@ -16,7 +16,6 @@ class UserForm extends StatefulWidget {
       {super.key,
       this.name,
       this.email,
-      this.password,
       this.city,
       this.phone,
       this.gender,
@@ -32,8 +31,6 @@ class _UserFormState extends State<UserForm> {
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _dobController = TextEditingController();
 
@@ -84,26 +81,66 @@ class _UserFormState extends State<UserForm> {
     'Sanand',
     'Himmatnagar'
   ];
-  final List<Map<String, dynamic>> hobbiesOptions = [
-    {"name": "Reading & Writing", "icon": Icons.menu_book},
-    {"name": "Traveling", "icon": Icons.flight},
-    {"name": "Cooking & Food", "icon": Icons.restaurant},
-    {"name": "Fitness & Yoga", "icon": Icons.fitness_center},
-    {"name": "Music & Dance", "icon": Icons.music_note},
+  final List<String> hobbiesOptions = [
+    "Reading & Writing",
+    "Traveling",
+    "Cooking & Food",
+    "Fitness & Yoga",
+    "Music & Dance",
   ];
+  final Map<String, IconData> hobbyIcons = {
+    "Reading & Writing": Icons.menu_book,
+    "Traveling": Icons.flight,
+    "Cooking & Food": Icons.restaurant,
+    "Fitness & Yoga": Icons.fitness_center,
+    "Music & Dance": Icons.music_note,
+  };
+
 
   @override
   void initState() {
     super.initState();
     _nameController.text = widget.name ?? '';
     _emailController.text = widget.email ?? '';
-    _passwordController.text = widget.password ?? '';
     _phoneController.text = widget.phone ?? '';
     _dobController.text = widget.dob ?? '';
     _selectedGender = widget.gender;
     _selectedCity = widget.city;
     selectedHobbies = widget.hobbies?.map((hobby) => hobby["name"] as String).toList() ?? [];
+  }
 
+  void _saveUser() async {
+    if (!_formkey.currentState!.validate()) return;
+
+    final user = {
+      'name': _nameController.text,
+      'email': _emailController.text,
+      'phone': _phoneController.text,
+      'gender': _selectedGender,
+      'dob': _dobController.text,
+      'city': _selectedCity,
+      'hobbies': selectedHobbies.join(', '), // Convert list to string
+      'isFavorite': 0, // Default value
+    };
+
+    if (widget.name == null) {
+      await DatabaseHelper.instance.insertUser(user);
+    } else {
+      await DatabaseHelper.instance.updateUser(widget.name.hashCode, user);
+    }
+
+    Navigator.pop(context, user);
+  }
+
+  void _resetForm() {
+    _nameController.clear();
+    _emailController.clear();
+    _phoneController.clear();
+    _dobController.clear();
+    _selectedGender = null;
+    _selectedCity = null;
+    selectedHobbies.clear();
+    setState(() {});
   }
 
   Widget build(BuildContext context) {
@@ -481,15 +518,11 @@ class _UserFormState extends State<UserForm> {
                                   spacing: 8,
                                   runSpacing: 8,
                                   children: hobbiesOptions.map((hobby) {
-                                    bool isSelected = selectedHobbies.contains(hobby["name"]);
+                                    bool isSelected = selectedHobbies.contains(hobby);
                                     return GestureDetector(
                                       onTap: () {
                                         setState(() {
-                                          if (isSelected) {
-                                            selectedHobbies.remove(hobby["name"]);
-                                          } else {
-                                            selectedHobbies.add(hobby["name"]);
-                                          }
+                                          isSelected ? selectedHobbies.remove(hobby) : selectedHobbies.add(hobby);
                                         });
                                       },
                                       child: Container(
@@ -505,13 +538,13 @@ class _UserFormState extends State<UserForm> {
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Icon(
-                                              hobby["icon"], // Ensure this is a valid icon reference
+                                              hobbyIcons[hobby], // Fetch icon from the map
                                               size: 20,
                                               color: isSelected ? Colors.white : Colors.grey[700],
                                             ),
                                             SizedBox(width: 6),
                                             Text(
-                                              hobby["name"],
+                                              hobby,
                                               style: TextStyle(
                                                 color: isSelected ? Colors.white : Colors.black87,
                                               ),
@@ -522,6 +555,7 @@ class _UserFormState extends State<UserForm> {
                                     );
                                   }).toList(),
                                 ),
+
 
                                 // Space before showing selected hobbies
                                 SizedBox(height: 10),
@@ -540,7 +574,25 @@ class _UserFormState extends State<UserForm> {
                         ),
                       ],
                     ),
+                    SizedBox(height: 10,),
 
+                    //Submit & Reset Button
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          onPressed: _saveUser,
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+                          child: Text("Save",style: TextStyle(color: Colors.white,fontSize: 17),),
+                        ),
+                        SizedBox(width: 15,),
+                        ElevatedButton(
+                          onPressed: _resetForm,
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+                          child: Text("Reset", style: TextStyle(color: Colors.white,fontSize: 17)),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               )),

@@ -11,7 +11,6 @@ List<Map<String,dynamic>> userList = [
     DOB: '2005-02-15',
     GENDER: 'Male',
     HOBBIES: ['Travelling'],
-    PASSWORD: '123456789'
   },
   {
     NAME:'Deep Vaghamashi',
@@ -23,6 +22,5 @@ List<Map<String,dynamic>> userList = [
     DOB:'2005-05-05',
     GENDER:'Male',
     HOBBIES:['Reading','Gaming'],
-    PASSWORD:'12345678'
   }
 ];

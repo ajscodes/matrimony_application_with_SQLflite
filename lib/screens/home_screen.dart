@@ -1,8 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:async';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final PageController _pageController = PageController(viewportFraction: 0.9);
+  int _currentPage = 0;
+  late Timer _timer;
+
+  final List<String> images = [
+    "assets/images/belogo.jpg",
+    "assets/images/CoupleVerical2.jpeg",
+    "assets/images/h1.jpeg",
+    "assets/images/EditCoupleVertical1.jpeg"
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _startAutoScroll();
+  }
+
+  void _startAutoScroll() {
+    _timer = Timer.periodic(Duration(seconds: 3), (timer) {
+      if (_currentPage < images.length - 1) {
+        _currentPage++;
+      } else {
+        _currentPage = 0; // Reset to the first image smoothly
+        _pageController.jumpToPage(0); // Instantly move to the first image
+      }
+      _pageController.animateToPage(
+        _currentPage,
+        duration: Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    _pageController.dispose();
+    super.dispose();
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -79,36 +124,70 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          children: [
-            TextField(
-              decoration: InputDecoration(
-                  hintText: 'Search User',
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(22.0)),
-                  suffixIcon: Icon(Icons.search)),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            ElevatedButton(onPressed: () => {
-              Navigator.pushNamed(context, '/adduser')
-            }, child: Text('Add User')),
-            SizedBox(
-              height: 10,
-            ),
-            ElevatedButton(onPressed: () => {}, child: Text('User List')),
-            SizedBox(
-              height: 10,
-            ),
-            ElevatedButton(onPressed: () => {}, child: Text('Favorite list')),
-            SizedBox(
-              height: 10,
-            ),
-            ElevatedButton(onPressed: () => {}, child: Text('About us')),
-          ],
+      body: Container(
+        color: Colors.grey[100],
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            children: [
+              TextField(
+                decoration: InputDecoration(
+                    hintText: 'Search User',
+                    fillColor: Colors.white10,
+                    filled: true,
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(18.0),
+                      borderSide: BorderSide(color: Colors.redAccent,width: 2)
+                    ),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey[400]!),
+                        borderRadius: BorderRadius.circular(18.0)),
+                    suffixIcon: Icon(Icons.search)),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              SizedBox(
+                height: 200,
+                child: PageView.builder(
+                  controller: _pageController,
+                  itemCount: images.length,
+                  onPageChanged: (index) {
+                    setState(() {
+                      _currentPage = index;
+                    });
+                  },
+                  itemBuilder: (context, index) {
+                    return Container(
+                      margin: EdgeInsets.symmetric(horizontal: 8),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        image: DecorationImage(
+                          image: AssetImage(images[index]),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              ElevatedButton(onPressed: () => {
+                Navigator.pushNamed(context, '/adduser')
+              }, child: Text('Add User')),
+              SizedBox(
+                height: 10,
+              ),
+              ElevatedButton(onPressed: () => {}, child: Text('User List')),
+              SizedBox(
+                height: 10,
+              ),
+              ElevatedButton(onPressed: () => {}, child: Text('Favorite list')),
+              SizedBox(
+                height: 10,
+              ),
+              ElevatedButton(onPressed: () => {}, child: Text('About us')),
+            ],
+          ),
         ),
       ),
     );

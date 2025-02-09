@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:matrimony_application/screens/aboutus_screen.dart';
 import 'package:matrimony_application/screens/bookmark_screen.dart';
 import 'package:matrimony_application/screens/home_screen.dart';
+import 'package:matrimony_application/screens/list_page.dart';
 import 'package:matrimony_application/screens/user_form.dart';
-import 'package:matrimony_application/screens/userlist_screen.dart';
 import 'package:matrimony_application/screens/navigation_screen.dart';
 import 'package:matrimony_application/screens/splash_screen.dart';
 
@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
         '/splash': (context) => SplashScreen(),
         '/navigation': (context) => NavigationScreen(),
         '/home': (context) => HomeScreen(),
-        '/userlist': (context) => UserListScreen(),
+        '/userlist': (context) => ListPage(),
         '/adduser': (context) => UserForm(),
         '/bookmark': (context) => BookmarkScreen(),
         '/aboutus': (context) => AboutusScreen(),
