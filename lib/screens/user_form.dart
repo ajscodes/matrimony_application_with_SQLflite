@@ -2,6 +2,7 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:matrimony_application/utils/database_helper.dart';
+import 'dart:convert';
 
 class UserForm extends StatefulWidget {
   final String? name;
@@ -10,7 +11,7 @@ class UserForm extends StatefulWidget {
   final String? phone;
   final String? gender;
   final String? dob;
-  final List<Map<String, dynamic>>? hobbies;
+  final List<String>? hobbies;
 
   const UserForm(
       {super.key,
@@ -82,20 +83,27 @@ class _UserFormState extends State<UserForm> {
     'Himmatnagar'
   ];
   final List<String> hobbiesOptions = [
-    "Reading & Writing",
+    "Reading",
+    "Writing",
     "Traveling",
-    "Cooking & Food",
-    "Fitness & Yoga",
-    "Music & Dance",
+    "Cooking",
+    "Food",
+    "Fitness",
+    "Yoga",
+    "Music",
+    "Dance",
   ];
   final Map<String, IconData> hobbyIcons = {
-    "Reading & Writing": Icons.menu_book,
+    "Reading": Icons.menu_book,
+    "Writing": Icons.create,
     "Traveling": Icons.flight,
-    "Cooking & Food": Icons.restaurant,
-    "Fitness & Yoga": Icons.fitness_center,
-    "Music & Dance": Icons.music_note,
+    "Cooking": Icons.restaurant,
+    "Food": Icons.fastfood,
+    "Fitness": Icons.fitness_center,
+    "Yoga": Icons.self_improvement,
+    "Music": Icons.music_note,
+    "Dance": Icons.directions_run,
   };
-
 
   @override
   void initState() {
@@ -106,7 +114,7 @@ class _UserFormState extends State<UserForm> {
     _dobController.text = widget.dob ?? '';
     _selectedGender = widget.gender;
     _selectedCity = widget.city;
-    selectedHobbies = widget.hobbies?.map((hobby) => hobby["name"] as String).toList() ?? [];
+    selectedHobbies = widget.hobbies ?? [];
   }
 
   void _saveUser() async {
@@ -119,7 +127,7 @@ class _UserFormState extends State<UserForm> {
       'gender': _selectedGender,
       'dob': _dobController.text,
       'city': _selectedCity,
-      'hobbies': selectedHobbies.join(', '), // Convert list to string
+      'hobbies': jsonEncode(selectedHobbies),
       'isFavorite': 0, // Default value
     };
 

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:matrimony_application/screens/user_detail.dart';
 import 'package:matrimony_application/screens/user_form.dart';
 import 'package:matrimony_application/utils/database_helper.dart';
+import 'dart:convert';
 
 
 class ListPage extends StatefulWidget {
@@ -13,6 +14,7 @@ class ListPage extends StatefulWidget {
 }
 
 class _ListPageState extends State<ListPage> {
+  Offset _fabPosition = Offset(300, 600);
   List<Map<String, dynamic>> user_List = [];
 
   @override
@@ -38,38 +40,75 @@ class _ListPageState extends State<ListPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.redAccent,
-        title: Text("User List",style: TextStyle(color: Colors.white),),
+        title: Text("User List", style: TextStyle(color: Colors.white)),
       ),
-      body: user_List.isEmpty
-          ? Center(child: Text("No users found."))
-          : ListView.builder(
-        itemCount: user_List.length,
-        itemBuilder: (context, index) {
-          return listCard(
-            index,
-            user_List[index]['id'],
-            user_List[index]['name'],
-            user_List[index]['email'],
-            user_List[index]['phone'],
-            user_List[index]['gender'],
-            user_List[index]['dob'],
-            user_List[index]['city'],
-            user_List[index]['hobbies'],
-            user_List[index]['isFavorite'] == 1,
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => UserForm()),
-          ).then((value) {
-            if (value != null) _loadUsers();
-          });
-        },
-        backgroundColor: Colors.redAccent,
-        child: Icon(Icons.add, color: Colors.white),
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 80.0), // Space for FAB
+            child: user_List.isEmpty
+                ? Center(child: Text("No users found."))
+                : ListView.builder(
+              padding: EdgeInsets.only(bottom: 16.0),
+              itemCount: user_List.length,
+              itemBuilder: (context, index) {
+                return listCard(
+                  index,
+                  user_List[index]['id'],
+                  user_List[index]['name'],
+                  user_List[index]['email'],
+                  user_List[index]['phone'],
+                  user_List[index]['gender'],
+                  user_List[index]['dob'],
+                  user_List[index]['city'],
+                  user_List[index]['hobbies'],
+                  user_List[index]['isFavorite'] == 1,
+                );
+              },
+            ),
+          ),
+
+          // Floating Action Button with Background
+          Positioned(
+            left: _fabPosition.dx,
+            top: _fabPosition.dy,
+            child: Draggable(
+              feedback: FloatingActionButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => UserForm()),
+                  ).then((value) {
+                    if (value != null) _loadUsers();
+                  });
+                },
+                backgroundColor: Colors.redAccent,
+                child: Icon(Icons.add, color: Colors.white),
+              ),
+              childWhenDragging: Container(),
+              onDragEnd: (details) {
+                setState(() {
+                  final screenSize = MediaQuery.of(context).size;
+                  double newX = details.offset.dx.clamp(0.0, screenSize.width - 56);
+                  double newY = details.offset.dy.clamp(0.0, screenSize.height - 120);
+                  _fabPosition = Offset(newX, newY);
+                });
+              },
+              child: FloatingActionButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => UserForm()),
+                  ).then((value) {
+                    if (value != null) _loadUsers();
+                  });
+                },
+                backgroundColor: Colors.redAccent,
+                child: Icon(Icons.add, color: Colors.white),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -91,7 +130,9 @@ class _ListPageState extends State<ListPage> {
                 dob: dob,
                 phone: phoneNumber,
                 city: city,
-                hobbies: hobbies.split(', '), // Convert back to list
+                hobbies: hobbies is String
+                    ? (jsonDecode(hobbies) as List<dynamic>).cast<String>() // Convert JSON string to List<String>
+                    : (hobbies as List<String>?),
               ),
             ),
           );
@@ -192,7 +233,9 @@ class _ListPageState extends State<ListPage> {
                               gender: gender,
                               dob: dob,
                               city: city,
-                              hobbies: hobbies.split(', '), // Convert back to list
+                              hobbies: hobbies is String
+                                  ? (jsonDecode(hobbies) as List<dynamic>).cast<String>() // Convert JSON string to List<String>
+                                  : (hobbies as List<String>?),
                             ),
                           ),
                         ).then((value) {
