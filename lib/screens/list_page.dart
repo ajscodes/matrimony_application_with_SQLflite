@@ -246,14 +246,24 @@ class _ListPageState extends State<ListPage> {
                           context: context,
                           builder: (context) {
                             return CupertinoAlertDialog(
-                              title: Text('Delete User'),
-                              content: Text('Are you sure you want to delete this user?'),
+                              title: Text(
+                                'Confirm Deletion',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              content: Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Text(
+                                  'Are you sure you want to remove this user?',
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                              ),
                               actions: [
                                 CupertinoDialogAction(
-                                  child: Text('Cancel'),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
+                                  child: Text(
+                                    'Cancel',
+                                    style: TextStyle(color: CupertinoColors.activeBlue),
+                                  ),
+                                  onPressed: () => Navigator.pop(context),
                                 ),
                                 CupertinoDialogAction(
                                   isDestructiveAction: true,
@@ -265,6 +275,7 @@ class _ListPageState extends State<ListPage> {
                                 ),
                               ],
                             );
+
                           },
                         );
                       }

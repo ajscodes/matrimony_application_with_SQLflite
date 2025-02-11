@@ -37,7 +37,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.list), label: 'User List'),
-          BottomNavigationBarItem(icon: Icon(Icons.bookmark), label: 'Bookmark'),
+          BottomNavigationBarItem(icon: Icon(Icons.star), label: 'Bookmark'),
           BottomNavigationBarItem(icon: Icon(Icons.info), label: 'About Us'),
         ],
       ),

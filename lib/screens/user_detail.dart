@@ -27,38 +27,14 @@ class UserDetail extends StatefulWidget {
 }
 
 class _UserDetailState extends State<UserDetail> {
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _dobController = TextEditingController();
-  final TextEditingController _ageController = TextEditingController();
-
-  String? _selectedGender;
-  String? _selectedCity;
-  List<String> _hobbies = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _nameController.text = widget.name ?? 'N/A';
-    _emailController.text = widget.email ?? 'N/A';
-    _phoneController.text = widget.phone ?? 'N/A';
-    _dobController.text = widget.dob ?? 'N/A';
-    _selectedGender = widget.gender ?? 'N/A';
-    _selectedCity = widget.city ?? 'N/A';
-    _hobbies = widget.hobbies ?? [];
-    _ageController.text = widget.age != null ? widget.age.toString() : 'N/A';
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: Text('Profile', style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white)),
+        backgroundColor: Colors.redAccent,
+        iconTheme: IconThemeData(color: Colors.white),
         centerTitle: true,
-        title: Text(
-          'Profile',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -66,63 +42,58 @@ class _UserDetailState extends State<UserDetail> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Profile Header
               Center(
                 child: Column(
                   children: [
-                    Icon(
-                      Icons.account_circle,
-                      size: 100,
+                    CircleAvatar(
+                      radius: 50,
+                      backgroundColor: Colors.grey.shade300,
+                      child: Icon(Icons.account_circle, size: 80, color: Colors.grey.shade600),
                     ),
+                    SizedBox(height: 10),
                     Text(
-                      _nameController.text,
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      widget.name ?? 'N/A',
+                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black87),
                     ),
                   ],
                 ),
               ),
-              SizedBox(height: 20),
-
-              // Section: About
-              sectionTitle('About'),
-              infoTile('Name', _nameController.text),
-              infoTile('Gender', _selectedGender!),
-              infoTile('Date of Birth', _dobController.text),
-              infoTile('Age', _ageController.text),
 
               SizedBox(height: 20),
 
-              // Section: Location
-              sectionTitle('Location'),
-              infoTile('Country', 'India'),
-              infoTile('City', _selectedCity!),
+              buildInfoCard(Icons.person, 'Name', widget.name),
+              buildInfoCard(Icons.wc, 'Gender', widget.gender),
+              buildInfoCard(Icons.calendar_today, 'Date of Birth', widget.dob),
+              buildInfoCard(Icons.cake, 'Age', widget.age?.toString()),
+              buildInfoCard(Icons.location_city, 'City', widget.city),
+              buildInfoCard(Icons.email, 'Email', widget.email),
+              buildInfoCard(Icons.phone, 'Phone', widget.phone),
 
               SizedBox(height: 20),
 
-              // Section: Professional Details
-              sectionTitle('Professional Details'),
-              infoTile('Higher Education', 'B.Sc (Hons) CS'),
-              infoTile('Occupation', 'Software Engineer'),
-
-              SizedBox(height: 20),
-
-              // Section: Contact Details
-              sectionTitle('Contact Details'),
-              infoTile('Email ID', _emailController.text),
-              infoTile('Phone', _phoneController.text),
-
-              SizedBox(height: 20),
-
-              // Section: Hobbies
-              sectionTitle('Hobbies'),
-              _hobbies.isNotEmpty
-                  ? Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: _hobbies
-                    .map((hobby) => Chip(label: Text(hobby)))
-                    .toList(),
-              )
-                  : Text('No hobbies selected.', style: TextStyle(fontSize: 16)),
+              // Hobbies Section
+              Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Hobbies', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      Divider(),
+                      widget.hobbies != null && widget.hobbies!.isNotEmpty
+                          ? Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: widget.hobbies!.map((hobby) => Chip(label: Text(hobby))).toList(),
+                      )
+                          : Text('No hobbies selected.', style: TextStyle(fontSize: 16, color: Colors.grey)),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -130,34 +101,28 @@ class _UserDetailState extends State<UserDetail> {
     );
   }
 
-  Widget sectionTitle(String title) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+  Widget buildInfoCard(IconData icon, String title, String? value) {
+    return Card(
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            Icon(icon, color: Colors.redAccent),
+            SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black54)),
+                  SizedBox(height: 4),
+                  Text(value ?? 'N/A', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87)),
+                ],
+              ),
+            ),
+          ],
         ),
-        Divider(),
-      ],
-    );
-  }
-
-  Widget infoTile(String title, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
-          ),
-          Text(
-            value,
-            style: TextStyle(fontSize: 16),
-          ),
-        ],
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -115,12 +116,45 @@ class _HomeScreenState extends State<HomeScreen> {
 
             // Logout
             ListTile(
-              leading: Icon(Icons.logout, color: Colors.redAccent),
-              title: Text("Logout"),
+              leading: Icon(CupertinoIcons.power, color: CupertinoColors.systemRed),
+              title: Text("Exit"),
               onTap: () {
-                SystemNavigator.pop();
+                showCupertinoDialog(
+                  context: context,
+                  builder: (context) => CupertinoAlertDialog(
+                    title: Text(
+                      'Exit App',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    content: Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        'Are you sure you want to exit the app?',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                    actions: [
+                      CupertinoDialogAction(
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(color: CupertinoColors.activeBlue),
+                        ),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                      CupertinoDialogAction(
+                        isDestructiveAction: true,
+                        child: Text('Exit'),
+                        onPressed: () {
+                          Navigator.pop(context); // Close dialog
+                          SystemNavigator.pop(); // Exit app
+                        },
+                      ),
+                    ],
+                  ),
+                );
               },
             ),
+
           ],
         ),
       ),
