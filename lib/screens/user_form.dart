@@ -1,5 +1,6 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:matrimony_application/utils/database_helper.dart';
 import 'dart:convert';
@@ -203,6 +204,7 @@ class _UserFormState extends State<UserForm> {
                         ),
                       ),
                       keyboardType: TextInputType.text,
+                      textCapitalization: TextCapitalization.words,
                       validator: (value) {
                         if (value == null ||
                             value.isEmpty ||
@@ -268,23 +270,20 @@ class _UserFormState extends State<UserForm> {
                         fillColor: Colors.white,
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                              color: Colors.grey[400]!), // Soft grey border
+                          borderSide: BorderSide(color: Colors.grey[400]!),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                              color: Colors.redAccent.shade200,
-                              width:
-                                  2), // Highlighted in redAccent when focused
+                          borderSide: BorderSide(color: Colors.redAccent.shade200, width: 2),
                         ),
                       ),
-                      keyboardType: TextInputType.phone,
+                      keyboardType: TextInputType.number, // Use number instead of phone
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly, // Restrict to digits only
+                      ],
                       maxLength: 10,
                       validator: (value) {
-                        if (value == null ||
-                            value.length != 10 ||
-                            !RegExp(r'^\+?1?\d{10}$').hasMatch(value)) {
+                        if (value == null || value.length != 10) {
                           return 'Please enter a valid 10-digit phone number';
                         }
                         return null;
