@@ -14,10 +14,10 @@ class _HomeScreenState extends State<HomeScreen> {
   late Timer _timer;
 
   final List<String> images = [
-    "assets/images/belogo.jpg",
-    "assets/images/CoupleVerical2.jpeg",
-    "assets/images/h1.jpeg",
-    "assets/images/EditCoupleVertical1.jpeg"
+    "assets/images/scroll1.jpg",
+    "assets/images/scroll2.jpeg",
+    "assets/images/scroll3.jpeg",
+    "assets/images/scroll4.jpeg"
   ];
 
   @override
@@ -154,7 +154,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               },
             ),
-
           ],
         ),
       ),
@@ -205,21 +204,78 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 ),
               ),
-              ElevatedButton(onPressed: () => {
-                Navigator.pushNamed(context, '/adduser')
-              }, child: Text('Add User')),
-              SizedBox(
-                height: 10,
-              ),
-              ElevatedButton(onPressed: () => {}, child: Text('User List')),
-              SizedBox(
-                height: 10,
-              ),
-              ElevatedButton(onPressed: () => {}, child: Text('Favorite list')),
-              SizedBox(
-                height: 10,
-              ),
-              ElevatedButton(onPressed: () => {}, child: Text('About us')),
+              SizedBox(height: 10,),
+              Column(
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/adduser');
+                    },
+                    icon: Icon(Icons.person_add, color: Colors.white),
+                    label: Text('Add User'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.redAccent,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 5,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/userlist');
+                    },
+                    icon: Icon(Icons.list, color: Colors.white),
+                    label: Text('User List'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueGrey,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 5,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/bookmark');
+                    },
+                    icon: Icon(Icons.favorite, color: Colors.white),
+                    label: Text('Favorite List'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.pinkAccent,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 5,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/aboutus');
+                    },
+                    icon: Icon(Icons.info, color: Colors.white),
+                    label: Text('About Us'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.deepPurple,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 5,
+                    ),
+                  ),
+                ],
+              )
             ],
           ),
         ),

@@ -109,10 +109,20 @@ class _UserFormState extends State<UserForm> {
   @override
   void initState() {
     super.initState();
+
     _nameController.text = widget.name ?? '';
     _emailController.text = widget.email ?? '';
     _phoneController.text = widget.phone ?? '';
-    _dobController.text = widget.dob ?? '';
+
+    // If DOB is null or empty, set a default date
+    if (widget.dob == null || widget.dob!.isEmpty) {
+      _selectedDate = DateTime(2000, 1, 1); // Default: 1st Jan 2000
+      _dobController.text = DateFormat('dd/MM/yyyy').format(_selectedDate!);
+    } else {
+      _selectedDate = DateFormat('dd/MM/yyyy').parse(widget.dob!);
+      _dobController.text = widget.dob!;
+    }
+
     _selectedGender = widget.gender;
     _selectedCity = widget.city;
     selectedHobbies = widget.hobbies ?? [];
