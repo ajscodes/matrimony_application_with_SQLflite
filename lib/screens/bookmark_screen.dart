@@ -38,25 +38,56 @@ class _BookmarkScreen extends State<BookmarkScreen> {
         backgroundColor: Colors.redAccent,
         title: Text("Favorite Users", style: TextStyle(color: Colors.white)),
       ),
-      body: favoriteUsers.isEmpty
-          ? Center(child: Text("No favorite users found."))
-          : ListView.builder(
-        itemCount: favoriteUsers.length,
-        itemBuilder: (context, index) {
-          return listCard(
-            index,
-            favoriteUsers[index]['id'],
-            favoriteUsers[index]['name'],
-            favoriteUsers[index]['email'],
-            favoriteUsers[index]['phone'],
-            favoriteUsers[index]['gender'],
-            favoriteUsers[index]['dob'],
-            favoriteUsers[index]['city'],
-            favoriteUsers[index]['hobbies'],
-            favoriteUsers[index]['isFavorite'] == 1,
-          );
-        },
-      ),
+        body: Column(
+          children: [
+            // Search Bar - Stays Fixed
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: TextField(
+                decoration: InputDecoration(
+                    hintText: 'Search User',
+                    fillColor: Colors.white10,
+                    filled: true,
+                    focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(18.0),
+                        borderSide: BorderSide(color: Colors.redAccent,width: 2)
+                    ),
+                    border: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey[400]!),
+                        borderRadius: BorderRadius.circular(18.0)),
+                    suffixIcon: Icon(Icons.search)),
+              ),
+            ),
+
+            // Scrollable List
+            Expanded(
+              child: favoriteUsers.isEmpty
+                  ? Center(
+                child: Text(
+                  "No favorite users found.",
+                  style: TextStyle(fontSize: 18),
+                ),
+              )
+                  : ListView.builder(
+                itemCount: favoriteUsers.length,
+                itemBuilder: (context, index) {
+                  return listCard(
+                    index,
+                    favoriteUsers[index]['id'],
+                    favoriteUsers[index]['name'],
+                    favoriteUsers[index]['email'],
+                    favoriteUsers[index]['phone'],
+                    favoriteUsers[index]['gender'],
+                    favoriteUsers[index]['dob'],
+                    favoriteUsers[index]['city'],
+                    favoriteUsers[index]['hobbies'],
+                    favoriteUsers[index]['isFavorite'] == 1,
+                  );
+                },
+              ),
+            ),
+          ],
+        )
     );
   }
 

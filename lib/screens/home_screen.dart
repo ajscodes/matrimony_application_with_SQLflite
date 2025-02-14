@@ -69,7 +69,13 @@ class _HomeScreenState extends State<HomeScreen> {
               accountEmail: Text("23010101159@darshan.ac.in"),
               currentAccountPicture: CircleAvatar(
                 backgroundColor: Colors.white,
-                child: Icon(Icons.person, size: 40, color: Colors.redAccent),
+                child: ClipOval(
+                  child: Image.asset('assets/images/me.jpeg',
+                    fit: BoxFit.cover,
+                    height: 70,
+                    width: 70,
+                  ),
+                ),
               ),
               decoration: BoxDecoration(
                 color: Colors.redAccent,
@@ -163,20 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.all(12.0),
           child: Column(
             children: [
-              TextField(
-                decoration: InputDecoration(
-                    hintText: 'Search User',
-                    fillColor: Colors.white10,
-                    filled: true,
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(18.0),
-                      borderSide: BorderSide(color: Colors.redAccent,width: 2)
-                    ),
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey[400]!),
-                        borderRadius: BorderRadius.circular(18.0)),
-                    suffixIcon: Icon(Icons.search)),
-              ),
+
               SizedBox(
                 height: 10,
               ),

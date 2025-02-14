@@ -47,7 +47,7 @@ class _ListPageState extends State<ListPage> {
           Padding(
             padding: const EdgeInsets.only(bottom: 80.0), // Space for FAB
             child: user_List.isEmpty
-                ? Center(child: Text("No users found."))
+                ? Center(child: Text("No users found.",style: TextStyle(fontSize: 18),))
                 : ListView.builder(
               padding: EdgeInsets.only(bottom: 16.0),
               itemCount: user_List.length,
