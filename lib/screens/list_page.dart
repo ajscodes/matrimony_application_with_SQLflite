@@ -5,7 +5,6 @@ import 'package:matrimony_application/screens/user_form.dart';
 import 'package:matrimony_application/utils/database_helper.dart';
 import 'dart:convert';
 
-
 class ListPage extends StatefulWidget {
   const ListPage({super.key});
 
@@ -14,7 +13,8 @@ class ListPage extends StatefulWidget {
 }
 
 class _ListPageState extends State<ListPage> {
-  Offset _fabPosition = Offset(300, 600);
+  double x = 300;
+  double y = 600;
   List<Map<String, dynamic>> user_List = [];
 
   @override
@@ -70,40 +70,40 @@ class _ListPageState extends State<ListPage> {
 
           // Floating Action Button with Background
           Positioned(
-            left: _fabPosition.dx,
-            top: _fabPosition.dy,
+            left: x,
+            top: y,
             child: Draggable(
-              feedback: FloatingActionButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => UserForm()),
-                  ).then((value) {
-                    if (value != null) _loadUsers();
-                  });
-                },
-                backgroundColor: Colors.redAccent,
-                child: Icon(Icons.add, color: Colors.white),
+              feedback: Material(
+                type: MaterialType.transparency, // Removes background
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [ // Adds slight shadow for better visibility
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 4,
+                      ),
+                    ],
+                  ),
+                  child: FloatingActionButton(
+                    backgroundColor: Colors.redAccent,
+                    onPressed: () {},
+                    child: Icon(Icons.add, color: Colors.white),
+                  ),
+                ),
               ),
-              childWhenDragging: Container(),
+              childWhenDragging: SizedBox(), // Hides FAB when dragging
               onDragEnd: (details) {
                 setState(() {
-                  final screenSize = MediaQuery.of(context).size;
-                  double newX = details.offset.dx.clamp(0.0, screenSize.width - 56);
-                  double newY = details.offset.dy.clamp(0.0, screenSize.height - 120);
-                  _fabPosition = Offset(newX, newY);
+                  x = details.offset.dx.clamp(0.0, MediaQuery.of(context).size.width - 56);
+                  y = details.offset.dy.clamp(0.0, MediaQuery.of(context).size.height - 56);
                 });
               },
               child: FloatingActionButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => UserForm()),
-                  ).then((value) {
-                    if (value != null) _loadUsers();
-                  });
-                },
                 backgroundColor: Colors.redAccent,
+                onPressed: () {
+                  Navigator.pushNamed(context, '/adduser');
+                },
                 child: Icon(Icons.add, color: Colors.white),
               ),
             ),
@@ -178,7 +178,7 @@ class _ListPageState extends State<ListPage> {
                         gender.toString().toLowerCase() == 'male'?Icon(Icons.male,color: Colors.blueAccent,):Icon(Icons.female,color: Colors.pinkAccent,),
                         const SizedBox(width: 4),
                         Text(
-                          "Insert age here",
+                          "Age will display here",
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey[600],
@@ -227,6 +227,7 @@ class _ListPageState extends State<ListPage> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => UserForm(
+                              id: id,
                               name: username,
                               email: email,
                               phone: phoneNumber,
@@ -294,4 +295,5 @@ class _ListPageState extends State<ListPage> {
       ),
     );
   }
+
 }

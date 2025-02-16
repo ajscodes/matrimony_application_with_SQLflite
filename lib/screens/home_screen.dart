@@ -169,12 +169,11 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.all(12.0),
           child: Column(
             children: [
-
               SizedBox(
                 height: 10,
               ),
               SizedBox(
-                height: 200,
+                height: 220,
                 child: PageView.builder(
                   controller: _pageController,
                   itemCount: images.length,

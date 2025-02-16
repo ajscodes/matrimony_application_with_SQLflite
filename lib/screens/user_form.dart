@@ -6,6 +6,7 @@ import 'package:matrimony_application/utils/database_helper.dart';
 import 'dart:convert';
 
 class UserForm extends StatefulWidget {
+  final int? id;
   final String? name;
   final String? email;
   final String? city;
@@ -16,6 +17,7 @@ class UserForm extends StatefulWidget {
 
   const UserForm(
       {super.key,
+      this.id,
       this.name,
       this.email,
       this.city,
@@ -145,10 +147,9 @@ class _UserFormState extends State<UserForm> {
     if (widget.name == null) {
       await DatabaseHelper.instance.insertUser(user);
     } else {
-      await DatabaseHelper.instance.updateUser(widget.name.hashCode, user);
+      await DatabaseHelper.instance.updateUser(widget.id!, user);
     }
-
-    Navigator.pop(context, user);
+    Navigator.pop(context, true);
   }
 
   void _resetForm() {
@@ -286,6 +287,7 @@ class _UserFormState extends State<UserForm> {
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(color: Colors.redAccent.shade200, width: 2),
                         ),
+                        counterText: "",
                       ),
                       keyboardType: TextInputType.number, // Use number instead of phone
                       inputFormatters: [
@@ -300,7 +302,7 @@ class _UserFormState extends State<UserForm> {
                       },
                     ),
                     SizedBox(
-                      height: 5,
+                      height: 10,
                     ),
 
                     //Date of Birth
