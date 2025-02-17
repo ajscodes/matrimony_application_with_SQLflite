@@ -106,16 +106,9 @@ class AboutusScreen extends StatelessWidget {
       children: [
         Row(
           children: [
-            Image.network(
-              'https://scontent.fraj2-1.fna.fbcdn.net/v/t39.30808-6/306781005_511047894359680_6012666892421775330_n.png?_nc_cat=110&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=WFUN6a7go9kQ7kNvgHhyRkS&_nc_oc=AdhA7GAFFTCW9Gy5yocH_0G7Os3Mdlgs_8hzTLqs_nfuwd_vV8o0KsRS92ugy-Q9nbKU2bXEFfx8sr6p4RPI_hkq&_nc_zt=23&_nc_ht=scontent.fraj2-1.fna&_nc_gid=Al4eNQT9ecm_iWg0QYJhnMO&oh=00_AYC63F9nDRwbCqX0abnulfTXEuXYbEYZf0mkrlR0YKhaug&oe=67B15071',
-              height: 120,
-              fit: BoxFit.contain,
-            ),
-            Image.network(
-              'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTyJclgXfX52jUN8XxpgpjSxX9RS-XVXZkp4g&s',
-              height: 120,
-              fit: BoxFit.contain,
-            ),
+            Image.asset('assets/dulogo.png',height: 120,),
+            SizedBox(width: 8,),
+            Image.asset('assets/images/aswdclogo.png',height: 120,),
           ],
         ),
         const SizedBox(height: 10),

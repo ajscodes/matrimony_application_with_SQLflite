@@ -14,19 +14,34 @@ class ListPage extends StatefulWidget {
 
 class _ListPageState extends State<ListPage> {
   double x = 300;
-  double y = 600;
+  double y = 525;
   List<Map<String, dynamic>> user_List = [];
+  List<Map<String, dynamic>> _filteredUsers = [];
+  TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _loadUsers();
+    _searchController.addListener(_filterUsers);
   }
 
   Future<void> _loadUsers() async {
     final users = await DatabaseHelper.instance.getUsers();
     setState(() {
       user_List = users;
+      _filteredUsers = users;
+    });
+  }
+
+  void _filterUsers() {
+    String query = _searchController.text.toLowerCase();
+    setState(() {
+      _filteredUsers = user_List
+          .where((user) => user['name'].toLowerCase().contains(query) ||
+          user['email'].toLowerCase().contains(query) ||
+          user['city'].toLowerCase().contains(query))
+          .toList();
     });
   }
 
@@ -42,71 +57,98 @@ class _ListPageState extends State<ListPage> {
         backgroundColor: Colors.redAccent,
         title: Text("User List", style: TextStyle(color: Colors.white)),
       ),
-      
-      body: Stack(
+
+      body: Column(
         children: [
+          // Search Bar
           Padding(
-            padding: const EdgeInsets.only(bottom: 80.0), // Space for FAB
-            child: user_List.isEmpty
-                ? Center(child: Text("No users found.",style: TextStyle(fontSize: 18),))
-                : ListView.builder(
-              padding: EdgeInsets.only(bottom: 16.0),
-              itemCount: user_List.length,
-              itemBuilder: (context, index) {
-                return listCard(
-                  index,
-                  user_List[index]['id'],
-                  user_List[index]['name'],
-                  user_List[index]['email'],
-                  user_List[index]['phone'],
-                  user_List[index]['gender'],
-                  user_List[index]['dob'],
-                  user_List[index]['city'],
-                  user_List[index]['hobbies'],
-                  user_List[index]['isFavorite'] == 1,
-                );
-              },
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: "Search by name, email, or city",
+                prefixIcon: Icon(Icons.search),
+                focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(18.0),
+                    borderSide: BorderSide(color: Colors.redAccent,width: 2)
+                ),
+                  border: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey[400]!),
+                      borderRadius: BorderRadius.circular(18.0)),
+                  suffixIcon: Icon(Icons.search)),
+              onChanged: (value) => _filterUsers(), // Calls filter function on input
             ),
           ),
 
-          // Floating Action Button with Background
-          Positioned(
-            left: x,
-            top: y,
-            child: Draggable(
-              feedback: Material(
-                type: MaterialType.transparency, // Removes background
-                child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [ // Adds slight shadow for better visibility
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 4,
-                      ),
-                    ],
-                  ),
-                  child: FloatingActionButton(
-                    backgroundColor: Colors.redAccent,
-                    onPressed: () {},
-                    child: Icon(Icons.add, color: Colors.white),
+          // User List & Floating Action Button inside Stack
+          Expanded(
+            child: Stack(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 80.0), // Space for FAB
+                  child: _filteredUsers.isEmpty
+                      ? Center(child: Text("No users found.", style: TextStyle(fontSize: 18)))
+                      : ListView.builder(
+                    padding: EdgeInsets.only(bottom: 16.0),
+                    itemCount: _filteredUsers.length,
+                    itemBuilder: (context, index) {
+                      return listCard(
+                        index,
+                        _filteredUsers[index]['id'],
+                        _filteredUsers[index]['name'],
+                        _filteredUsers[index]['email'],
+                        _filteredUsers[index]['phone'],
+                        _filteredUsers[index]['gender'],
+                        _filteredUsers[index]['dob'],
+                        _filteredUsers[index]['city'],
+                        _filteredUsers[index]['hobbies'],
+                        _filteredUsers[index]['isFavorite'] == 1,
+                      );
+                    },
                   ),
                 ),
-              ),
-              childWhenDragging: SizedBox(), // Hides FAB when dragging
-              onDragEnd: (details) {
-                setState(() {
-                  x = details.offset.dx.clamp(0.0, MediaQuery.of(context).size.width - 56);
-                  y = details.offset.dy.clamp(0.0, MediaQuery.of(context).size.height - 56);
-                });
-              },
-              child: FloatingActionButton(
-                backgroundColor: Colors.redAccent,
-                onPressed: () {
-                  Navigator.pushNamed(context, '/adduser');
-                },
-                child: Icon(Icons.add, color: Colors.white),
-              ),
+
+                // Floating Action Button with Background
+                Positioned(
+                  left: x,
+                  top: y,
+                  child: Draggable(
+                    feedback: Material(
+                      type: MaterialType.transparency, // Removes background
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 4,
+                            ),
+                          ],
+                        ),
+                        child: FloatingActionButton(
+                          backgroundColor: Colors.redAccent,
+                          onPressed: () {},
+                          child: Icon(Icons.add, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    childWhenDragging: SizedBox(), // Hides FAB when dragging
+                    onDragEnd: (details) {
+                      setState(() {
+                        x = details.offset.dx.clamp(0.0, MediaQuery.of(context).size.width - 56);
+                        y = details.offset.dy.clamp(0.0, MediaQuery.of(context).size.height - 56);
+                      });
+                    },
+                    child: FloatingActionButton(
+                      backgroundColor: Colors.redAccent,
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/adduser');
+                      },
+                      child: Icon(Icons.add, color: Colors.white),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
