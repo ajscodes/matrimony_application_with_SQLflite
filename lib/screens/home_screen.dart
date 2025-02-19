@@ -120,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
             Divider(),
 
-            // Logout
+            // Exit Button
             ListTile(
               leading: Icon(CupertinoIcons.power, color: CupertinoColors.systemRed),
               title: Text("Exit"),
@@ -196,82 +196,75 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 ),
               ),
-              SizedBox(height: 10,),
+              SizedBox(height: 15,),
               Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/adduser');
-                    },
-                    icon: Icon(Icons.person_add, color: Colors.white),
-                    label: Text('Add User'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.redAccent,
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 5,
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/userlist');
-                    },
-                    icon: Icon(Icons.list, color: Colors.white),
-                    label: Text('User List'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueGrey,
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 5,
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/bookmark');
-                    },
-                    icon: Icon(Icons.favorite, color: Colors.white),
-                    label: Text('Favorite List'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.pinkAccent,
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 5,
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/aboutus');
-                    },
-                    icon: Icon(Icons.info, color: Colors.white),
-                    label: Text('About Us'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple,
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 5,
-                    ),
+                  GridView.count(
+                    shrinkWrap: true,
+                    crossAxisCount: 2, // 2 icons per row
+                    mainAxisSpacing: 1, // Space between rows
+                    childAspectRatio: 1, // Ensures square shape
+                    children: [
+                      buildIconButton(context, 'assets/Icons/Final1.png', '/adduser', 'Add User'),
+                      buildIconButton(context, 'assets/Icons/2.png', '/userlist', 'User List'),
+                      buildIconButton(context, 'assets/Icons/Fianl3.png', '/bookmark', 'Bookmark List'),
+                      buildIconButton(context, 'assets/Icons/Final4.png', '/aboutus', 'About Us'),
+                    ],
                   ),
                 ],
-              )
+              ),
+
             ],
           ),
         ),
       ),
     );
   }
+}
+
+Widget buildIconButton(BuildContext context, String iconPath, String route, String label) {
+  return Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      InkWell(
+        onTap: () {
+          Navigator.pushNamed(context, route);
+        },
+        child: Container(
+          width: 125,
+          height: 125,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [  // Adding shadow for a 3D effect
+              BoxShadow(
+                color: Colors.grey.shade300,
+                offset: Offset(4, 4),
+                blurRadius: 10,
+                spreadRadius: 2,
+              ),
+              BoxShadow(
+                color: Colors.white,
+                offset: Offset(-4, -4),
+                blurRadius: 10,
+                spreadRadius: 2,
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Image.asset(
+              iconPath,
+              width: 40,
+              height: 40,
+              fit: BoxFit.contain,
+            ),
+          ),
+        ),
+      ),
+      SizedBox(height: 8), // Spacing between icon and label
+      Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+    ],
+  );
 }

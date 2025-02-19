@@ -56,6 +56,7 @@ class _ListPageState extends State<ListPage> {
       appBar: AppBar(
         backgroundColor: Colors.redAccent,
         title: Text("User List", style: TextStyle(color: Colors.white)),
+        iconTheme: IconThemeData(color: Colors.white),
       ),
 
       body: Column(

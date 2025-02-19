@@ -37,6 +37,7 @@ class _BookmarkScreen extends State<BookmarkScreen> {
       appBar: AppBar(
         backgroundColor: Colors.redAccent,
         title: Text("Favorite Users", style: TextStyle(color: Colors.white)),
+        iconTheme: IconThemeData(color: Colors.white),
       ),
         body: Column(
           children: [
