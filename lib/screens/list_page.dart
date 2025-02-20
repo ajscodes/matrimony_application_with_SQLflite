@@ -45,6 +45,42 @@ class _ListPageState extends State<ListPage> {
     });
   }
 
+  void _showFavoriteConfirmationDialog(BuildContext context, VoidCallback onConfirm) {
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: Text(
+          'Confirm Action',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: Padding(
+          padding: const EdgeInsets.only(top: 8.0),
+          child: Text(
+            'Are you sure you want to change the favorite status?',
+            style: TextStyle(fontSize: 16),
+          ),
+        ),
+        actions: [
+          CupertinoDialogAction(
+            child: Text(
+              'No',
+              style: TextStyle(color: CupertinoColors.activeBlue),
+            ),
+            onPressed: () => Navigator.pop(context),
+          ),
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            child: Text('Yes'),
+            onPressed: () {
+              Navigator.pop(context); // Close dialog
+              onConfirm(); // Perform the favorite action
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _deleteUser(int id) async {
     await DatabaseHelper.instance.deleteUser(id);
     _loadUsers();
@@ -76,7 +112,7 @@ class _ListPageState extends State<ListPage> {
                   border: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.grey[400]!),
                       borderRadius: BorderRadius.circular(18.0)),
-                  suffixIcon: Icon(Icons.search)),
+                  ),
               onChanged: (value) => _filterUsers(), // Calls filter function on input
             ),
           ),
@@ -253,15 +289,27 @@ class _ListPageState extends State<ListPage> {
                 children: [
                   IconButton(
                     icon: Icon(
+                      size: 25,
                       isFavorite ? Icons.star : Icons.star_border,
                       color: Colors.amberAccent,
                     ),
-                    onPressed: () async {
-                      await DatabaseHelper.instance.updateUser(
-                        id,
-                        {'isFavorite': isFavorite ? 0 : 1},
-                      );
-                      _loadUsers();
+                    onPressed: () {
+                      if (isFavorite) {
+                        // Show confirmation dialog only when removing from favorites
+                        _showFavoriteConfirmationDialog(context, () async {
+                          await DatabaseHelper.instance.updateUser(
+                            id,
+                            {'isFavorite': 0}, // Removing from favorite
+                          );
+                          _loadUsers();
+                        });
+                      } else {
+                        // Directly add to favorite without confirmation
+                        DatabaseHelper.instance.updateUser(
+                          id,
+                          {'isFavorite': 1}, // Adding to favorite
+                        ).then((_) => _loadUsers());
+                      }
                     },
                   ),
                   PopupMenuButton<String>(

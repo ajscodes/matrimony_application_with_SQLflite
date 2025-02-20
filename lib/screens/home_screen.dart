@@ -26,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _startAutoScroll();
   }
 
+
   void _startAutoScroll() {
     _timer = Timer.periodic(Duration(seconds: 3), (timer) {
       if (_currentPage < images.length - 1) {
