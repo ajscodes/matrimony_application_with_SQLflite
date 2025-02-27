@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -9,9 +10,20 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration(seconds: 1), () {
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+
+    Future.delayed(Duration(seconds: 2), () {
       if (mounted) {
-        Navigator.pushReplacementNamed(context, '/navigation');
+        if (isLoggedIn) {
+          Navigator.pushReplacementNamed(context, '/navigation'); // Home Screen
+        } else {
+          Navigator.pushReplacementNamed(context, '/login'); // Login Screen
+        }
       }
     });
   }
@@ -27,7 +39,6 @@ class _SplashScreenState extends State<SplashScreen> {
             "assets/images/logo.jpg",
             fit: BoxFit.cover,
           ),
-
           Center(
             child: Container(
               padding: EdgeInsets.all(20),
@@ -41,14 +52,13 @@ class _SplashScreenState extends State<SplashScreen> {
                   CircularProgressIndicator(
                     color: Colors.cyan,
                   ),
-                  SizedBox(width: 15
-                  ),
+                  SizedBox(width: 15),
                   Text(
                     "Just a moment",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white, //White text color for visibility
+                      color: Colors.white, // White text color for visibility
                     ),
                   ),
                 ],

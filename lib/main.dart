@@ -4,6 +4,7 @@ import 'package:matrimony_application/screens/aboutus_screen.dart';
 import 'package:matrimony_application/screens/bookmark_screen.dart';
 import 'package:matrimony_application/screens/home_screen.dart';
 import 'package:matrimony_application/screens/list_page.dart';
+import 'package:matrimony_application/screens/login_screen.dart';
 import 'package:matrimony_application/screens/user_form.dart';
 import 'package:matrimony_application/screens/navigation_screen.dart';
 import 'package:matrimony_application/screens/splash_screen.dart';
@@ -33,6 +34,7 @@ class MyApp extends StatelessWidget {
         '/adduser': (context) => UserForm(),
         '/bookmark': (context) => BookmarkScreen(),
         '/aboutus': (context) => AboutusScreen(),
+        '/login': (context) => LoginScreen()
       },
       onUnknownRoute: (settings) {
         return MaterialPageRoute(builder: (_) => NotFoundScreen()); // Handle unknown routes
