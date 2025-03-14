@@ -137,23 +137,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: TextStyle(color: Colors.white, fontSize: 18),
                     ),
                   ),
-
-                  SizedBox(height: 10),
-
-                  // Sign Up Option
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("Don't have an account?"),
-                      TextButton(
-                        onPressed: () {},
-                        child: Text(
-                          "Help",
-                          style: TextStyle(color: Colors.redAccent),
-                        ),
-                      ),
-                    ],
-                  ),
                 ],
               ),
             ),

@@ -4,6 +4,7 @@ import 'package:matrimony_application/screens/user_detail.dart';
 import 'package:matrimony_application/screens/user_form.dart';
 import 'package:matrimony_application/utils/database_helper.dart';
 import 'dart:convert';
+import 'package:intl/intl.dart';
 
 class ListPage extends StatefulWidget {
   const ListPage({super.key});
@@ -23,26 +24,101 @@ class _ListPageState extends State<ListPage> {
   void initState() {
     super.initState();
     _loadUsers();
-    _searchController.addListener(_filterUsers);
+    //_searchController.addListener(_filterUsers);
   }
 
   Future<void> _loadUsers() async {
-    final users = await DatabaseHelper.instance.getUsers();
-    setState(() {
-      user_List = users;
-      _filteredUsers = users;
-    });
+    try {
+      final users = await DatabaseHelper.instance.getUsers();
+      print('Fetched users: $users');
+      setState(() {
+        user_List = users.map((user) {
+          // Create a new map with the updated 'age' and decoded 'hobbies'
+          final newUser = Map<String, dynamic>.from(user);
+          newUser['age'] = user['dob'] != null ? _calculateAge(user['dob']) : 0;
+
+          // Decode the hobbies JSON string
+          try {
+            newUser['hobbies'] = (jsonDecode(user['hobbies'] as String) as List<dynamic>).cast<String>();
+            print('Decoded hobbies: ${newUser['hobbies']}'); // Add this line
+            print('Type of hobbies: ${newUser['hobbies'].runtimeType}'); // Add this line
+          } catch (e) {
+            print('Error decoding hobbies: $e');
+            newUser['hobbies'] = []; // Default to an empty list in case of error
+          }
+
+          return newUser;
+        }).toList();
+        _filteredUsers = List.from(user_List);
+        print('User List: $user_List');
+        print('Filtered Users: $_filteredUsers');
+      });
+    } catch (e) {
+      print('Error loading users: $e');
+    }
+  }
+
+  int _calculateAge(String dob) {
+    DateTime birthDate = DateFormat('dd/MM/yyyy').parse(dob);
+    int age = DateTime.now().year - birthDate.year;
+    if (DateTime.now().month < birthDate.month ||
+        (DateTime.now().month == birthDate.month && DateTime.now().day < birthDate.day)) {
+      age--;
+    }
+    return age;
   }
 
   void _filterUsers() {
     String query = _searchController.text.toLowerCase();
     setState(() {
       _filteredUsers = user_List
-          .where((user) => user['name'].toLowerCase().contains(query) ||
+          .where((user) =>
+      user['name'].toLowerCase().contains(query) ||
           user['email'].toLowerCase().contains(query) ||
           user['city'].toLowerCase().contains(query))
+          .map((user) => {
+        ...user,
+        'age': user['age'],
+        'hobbies': user['hobbies'],
+      })
           .toList();
     });
+  }
+
+  void _showDeleteConfirmationDialog(BuildContext context, int userId) {
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: Text(
+          'Confirm Delete',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: Padding(
+          padding: const EdgeInsets.only(top: 8.0),
+          child: Text(
+            'Are you sure you want to delete this user?',
+            style: TextStyle(fontSize: 16),
+          ),
+        ),
+        actions: [
+          CupertinoDialogAction(
+            child: Text(
+              'No',
+              style: TextStyle(color: CupertinoColors.activeBlue),
+            ),
+            onPressed: () => Navigator.pop(context),
+          ),
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            child: Text('Yes'),
+            onPressed: () {
+              Navigator.pop(context); // Close dialog
+              _deleteUser(userId); // Perform the delete action
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   void _showFavoriteConfirmationDialog(BuildContext context, VoidCallback onConfirm) {
@@ -86,6 +162,7 @@ class _ListPageState extends State<ListPage> {
     _loadUsers();
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -100,22 +177,42 @@ class _ListPageState extends State<ListPage> {
           // Search Bar
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: "Search by name, email, or city",
-                prefixIcon: Icon(Icons.search),
-                focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(18.0),
-                    borderSide: BorderSide(color: Colors.redAccent,width: 2)
-                ),
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey[400]!),
-                      borderRadius: BorderRadius.circular(18.0)),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: "Search by name, email, or city",
+                      prefixIcon: Icon(Icons.search),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(18.0),
+                        borderSide: BorderSide(color: Colors.redAccent, width: 2),
+                      ),
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey[400]!),
+                        borderRadius: BorderRadius.circular(18.0),
+                      ),
+                    ),
+                    onChanged: (value) => _filterUsers(), // Calls filter function on input
                   ),
-              onChanged: (value) => _filterUsers(), // Calls filter function on input
+                ),
+                SizedBox(width: 8),
+                // Sorting Button
+                PopupMenuButton<String>(
+                  //onSelected: _sortUsers,
+                  icon: Icon(Icons.sort, color: Colors.redAccent),
+                  itemBuilder: (context) => [
+                    PopupMenuItem(value: 'A-Z', child: Text('Name(A-Z)')),
+                    PopupMenuItem(value: 'Z-A', child: Text('Name(Z-A)')),
+                    PopupMenuItem(value: 'Young-Old', child: Text('Age(18-65)')),
+                    PopupMenuItem(value: 'Old-Young', child: Text('Age(65-18)')),
+                  ],
+                ),
+              ],
             ),
           ),
+
 
           // User List & Floating Action Button inside Stack
           Expanded(
@@ -126,6 +223,7 @@ class _ListPageState extends State<ListPage> {
                   child: _filteredUsers.isEmpty
                       ? Center(child: Text("No users found.", style: TextStyle(fontSize: 18)))
                       : ListView.builder(
+                    key: UniqueKey(),
                     padding: EdgeInsets.only(bottom: 16.0),
                     itemCount: _filteredUsers.length,
                     itemBuilder: (context, index) {
@@ -137,10 +235,12 @@ class _ListPageState extends State<ListPage> {
                         _filteredUsers[index]['phone'],
                         _filteredUsers[index]['gender'],
                         _filteredUsers[index]['dob'],
+                        _filteredUsers[index]['age'],  // Pass age here
                         _filteredUsers[index]['city'],
-                        _filteredUsers[index]['hobbies'],
+                        _filteredUsers[index]['hobbies'], // Make sure this is a List<String>
                         _filteredUsers[index]['isFavorite'] == 1,
                       );
+
                     },
                   ),
                 ),
@@ -179,7 +279,11 @@ class _ListPageState extends State<ListPage> {
                     child: FloatingActionButton(
                       backgroundColor: Colors.redAccent,
                       onPressed: () {
-                        Navigator.pushNamed(context, '/adduser');
+                        Navigator.pushNamed(context, '/adduser').then((value) {
+                          if (value == true) {
+                            _loadUsers(); // Refresh the list
+                          }
+                        });
                       },
                       child: Icon(Icons.add, color: Colors.white),
                     ),
@@ -193,7 +297,9 @@ class _ListPageState extends State<ListPage> {
     );
   }
 
-  Widget listCard(index, int id, username, email, phoneNumber, gender, dob, city, hobbies, bool isFavorite) {
+  Widget listCard(int index, int id, String name, String email, String phone,
+      String gender, String dob, int age, String city,
+      List<String> hobbies, bool isFavorite) {
     return Card(
       elevation: 4,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -204,15 +310,14 @@ class _ListPageState extends State<ListPage> {
             context,
             MaterialPageRoute(
               builder: (context) => UserDetail(
-                name: username,
+                name: name,
                 email: email,
                 gender: gender,
                 dob: dob,
-                phone: phoneNumber,
+                age: age, // Pass age here
+                phone: phone,
                 city: city,
-                hobbies: hobbies is String
-                    ? (jsonDecode(hobbies) as List<dynamic>).cast<String>() // Convert JSON string to List<String>
-                    : (hobbies as List<String>?),
+                hobbies: hobbies,
               ),
             ),
           );
@@ -230,7 +335,6 @@ class _ListPageState extends State<ListPage> {
                     backgroundImage: NetworkImage("https://picsum.photos/id/237/200/300"),
                     backgroundColor: Colors.grey[200],
                   ),
-                  //if (isVerified)
                   Positioned(
                     bottom: 0,
                     right: 0,
@@ -246,7 +350,7 @@ class _ListPageState extends State<ListPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      username,
+                      name,
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -255,10 +359,12 @@ class _ListPageState extends State<ListPage> {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        gender.toString().toLowerCase() == 'male'?Icon(Icons.male,color: Colors.blueAccent,):Icon(Icons.female,color: Colors.pinkAccent,),
+                        gender.toLowerCase() == 'male'
+                            ? Icon(Icons.male, color: Colors.blueAccent)
+                            : Icon(Icons.female, color: Colors.pinkAccent),
                         const SizedBox(width: 4),
                         Text(
-                          "Age will display here",
+                          "$age years", // Display age
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey[600],
@@ -287,6 +393,7 @@ class _ListPageState extends State<ListPage> {
               // Star & More Actions
               Column(
                 children: [
+                  // Favorite Toggle Button
                   IconButton(
                     icon: Icon(
                       size: 25,
@@ -295,7 +402,7 @@ class _ListPageState extends State<ListPage> {
                     ),
                     onPressed: () {
                       if (isFavorite) {
-                        // Show confirmation dialog only when removing from favorites
+                        // Show confirmation dialog before removing from favorites
                         _showFavoriteConfirmationDialog(context, () async {
                           await DatabaseHelper.instance.updateUser(
                             id,
@@ -312,65 +419,33 @@ class _ListPageState extends State<ListPage> {
                       }
                     },
                   ),
+
+                  // Popup Menu for Edit & Delete
                   PopupMenuButton<String>(
                     onSelected: (value) {
                       if (value == 'edit') {
+                        // Navigate to Edit Form
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => UserForm(
                               id: id,
-                              name: username,
+                              name: name,
                               email: email,
-                              phone: phoneNumber,
+                              phone: phone,
                               gender: gender,
                               dob: dob,
+                              age: age, // Pass age here
                               city: city,
-                              hobbies: hobbies is String
-                                  ? (jsonDecode(hobbies) as List<dynamic>).cast<String>() // Convert JSON string to List<String>
-                                  : (hobbies as List<String>?),
+                              hobbies: hobbies,
                             ),
                           ),
                         ).then((value) {
                           if (value != null) _loadUsers();
                         });
                       } else if (value == 'delete') {
-                        showCupertinoDialog(
-                          context: context,
-                          builder: (context) {
-                            return CupertinoAlertDialog(
-                              title: Text(
-                                'Confirm Deletion',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              content: Padding(
-                                padding: const EdgeInsets.only(top: 8.0),
-                                child: Text(
-                                  'Are you sure you want to remove this user?',
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                              ),
-                              actions: [
-                                CupertinoDialogAction(
-                                  child: Text(
-                                    'Cancel',
-                                    style: TextStyle(color: CupertinoColors.activeBlue),
-                                  ),
-                                  onPressed: () => Navigator.pop(context),
-                                ),
-                                CupertinoDialogAction(
-                                  isDestructiveAction: true,
-                                  child: Text('Delete'),
-                                  onPressed: () {
-                                    _deleteUser(id);
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                              ],
-                            );
-
-                          },
-                        );
+                        // Show delete confirmation dialog
+                        _showDeleteConfirmationDialog(context, id);
                       }
                     },
                     itemBuilder: (context) => [
@@ -387,4 +462,6 @@ class _ListPageState extends State<ListPage> {
       ),
     );
   }
+
+
 }

@@ -7,8 +7,8 @@ class UserDetail extends StatefulWidget {
   final String? phone;
   final String? gender;
   final String? dob;
-  final List<String>? hobbies;
   final int? age;
+  final List<String>? hobbies;
 
   UserDetail({
     super.key,

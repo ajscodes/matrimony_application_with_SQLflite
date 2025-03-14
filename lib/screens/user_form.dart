@@ -13,6 +13,7 @@ class UserForm extends StatefulWidget {
   final String? phone;
   final String? gender;
   final String? dob;
+  final int? age;
   final List<String>? hobbies;
 
   const UserForm(
@@ -23,6 +24,7 @@ class UserForm extends StatefulWidget {
       this.city,
       this.phone,
       this.gender,
+      this.age,
       this.dob,
       this.hobbies});
 
@@ -133,18 +135,26 @@ class _UserFormState extends State<UserForm> {
   void _saveUser() async {
     if (!_formkey.currentState!.validate()) return;
 
+    DateTime dob = DateFormat('dd/MM/yyyy').parse(_dobController.text);
+    int age = DateTime.now().year - dob.year;
+    if (DateTime.now().month < dob.month ||
+        (DateTime.now().month == dob.month && DateTime.now().day < dob.day)) {
+      age--; // Adjust age if birthday hasn't happened yet
+    }
+
     final user = {
       'name': _nameController.text,
       'email': _emailController.text,
       'phone': _phoneController.text,
       'gender': _selectedGender,
       'dob': _dobController.text,
+      'age': age,  // Store Age
       'city': _selectedCity,
       'hobbies': jsonEncode(selectedHobbies),
-      'isFavorite': 0, // Default value
+      'isFavorite': 0,
     };
 
-    if (widget.name == null) {
+    if (widget.id == null) {
       await DatabaseHelper.instance.insertUser(user);
     } else {
       await DatabaseHelper.instance.updateUser(widget.id!, user);

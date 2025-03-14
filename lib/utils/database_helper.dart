@@ -17,11 +17,19 @@ class DatabaseHelper {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
 
+    Future<void> _upgradeDB(Database db, int oldVersion, int newVersion) async {
+      if (oldVersion < 2) {
+        await db.execute("ALTER TABLE users ADD COLUMN age INTEGER DEFAULT 0");
+      }
+    }
+
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _createDB,
+      onUpgrade: _upgradeDB,
     );
+
   }
 
   Future<void> _createDB(Database db, int version) async {
@@ -29,10 +37,11 @@ class DatabaseHelper {
       CREATE TABLE users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT,
-        email TEXT,
+        email TEXT, 
         phone TEXT,
         gender TEXT,
         dob TEXT,
+        age INTEGER,
         city TEXT,
         hobbies TEXT,
         isFavorite INTEGER
@@ -47,8 +56,10 @@ class DatabaseHelper {
 
   Future<List<Map<String, dynamic>>> getUsers() async {
     final db = await instance.database;
-    return await db.query('users');
+    return await db.query('users', orderBy: "id DESC"); // Recently added on top
   }
+
+
 
   Future<int> updateUser(int id, Map<String, dynamic> user) async {
     final db = await instance.database;
